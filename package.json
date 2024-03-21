@@ -1,0 +1,32 @@
+{
+  "name": "ft-online-cms",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Max Zhao",
+  "license": "ISC",
+  "keywords": [],
+  "main": "dist/app.js",
+  "scripts": {
+    "dev": "tsup src/app.ts --watch --onSuccess \"DEBUG=* node dist/app.js\"",
+    "build": "tsup src/app.ts"
+  },
+  "dependencies": {
+    "debug": "^4.3.4",
+    "h3": "^1.11.1",
+    "ofetch": "^1.3.4",
+    "reflect-metadata": "^0.2.1",
+    "sqlite3": "^5.1.7",
+    "typeorm": "^0.3.20"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^2.9.0",
+    "@swc/core": "^1.4.8",
+    "@tsconfig/node20": "^20.1.2",
+    "@types/debug": "^4.1.12",
+    "@types/node": "^20.11.30",
+    "eslint": "^8.57.0",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.3"
+  }
+}
