@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 import type { VideoType } from '../crawler/types'
 import { VideoGenre } from './video-genre'
 
@@ -50,9 +50,9 @@ export class Video {
   @JoinColumn({ name: 'videoGenreId' })
   genres: VideoGenre[]
 
-  @Column()
-  createDateTime: number
+  @CreateDateColumn()
+  createDateTime: Date
 
-  @Column()
-  updateDateTime: number
+  @UpdateDateColumn()
+  updateDateTime: Date
 }

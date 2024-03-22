@@ -76,7 +76,6 @@ export class Crawler {
   async #updateVideo(parsedVideo: ParsedVideo, type: VideoType) {
     const oldMovie = await this.#videoRepository.findOneBy({ name: parsedVideo.name, year: parsedVideo.year })
     if (oldMovie) {
-      oldMovie.updateDateTime = Date.now()
       const result = await this.#videoRepository.update({ id: oldMovie.id }, { ...parsedVideo, type })
       if (result.affected)
         return { ...oldMovie, ...parsedVideo, type }
@@ -87,8 +86,6 @@ export class Crawler {
       const video = new Video()
       Object.assign(video, parsedVideo)
       video.type = type
-      video.createDateTime = Date.now()
-      video.updateDateTime = video.createDateTime
       return await this.#videoRepository.save(video)
     }
   }

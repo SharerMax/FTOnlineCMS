@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 
 @Entity()
 export class Provider {
@@ -18,4 +18,13 @@ export class Provider {
 
   @Column({ default: 0 })
   priority: number
+
+  @Column({ default: true })
+  enable: boolean
+
+  @CreateDateColumn()
+  createDateTime: Date
+
+  @UpdateDateColumn()
+  updateDateTime: Date
 }
