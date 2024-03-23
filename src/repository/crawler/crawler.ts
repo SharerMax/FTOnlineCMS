@@ -1,5 +1,6 @@
-import { type $Fetch, ofetch } from 'ofetch'
 import debug from 'debug'
+import { mergeWith } from 'lodash-es'
+import { type $Fetch, ofetch } from 'ofetch'
 import { AppDataSource } from '../data-source'
 import { Episode } from '../entry/episode'
 import { Genre } from '../entry/genre'
@@ -73,14 +74,40 @@ export class Crawler {
     return hasUpdateGenre
   }
 
+  mergeVideo(video: Video, newVideo: ParsedVideo): Video {
+    return mergeWith(video, newVideo, (objValue, srcValue, key) => {
+      if (!srcValue)
+        return objValue
+      if (!objValue)
+        return srcValue
+
+      if (typeof objValue === 'string' && typeof srcValue === 'string') {
+        if (srcValue.includes(objValue))
+          return srcValue
+        if (objValue.includes(srcValue))
+          return objValue
+      }
+      const a = key as keyof Video
+      if (a === 'score')
+        return Math.max(objValue, srcValue)
+      if (a === 'director' || a === 'actors' || a === 'nickName') {
+        const set = new Set<string>((srcValue as string).split(','))
+        ;(objValue as string).split(',').forEach(v => set.add(v))
+        return Array.from(set).join(',')
+      }
+      return objValue
+    })
+  }
+
   async #updateVideo(parsedVideo: ParsedVideo, type: VideoType) {
-    const oldMovie = await this.#videoRepository.findOneBy({ name: parsedVideo.name, year: parsedVideo.year })
-    if (oldMovie) {
-      const result = await this.#videoRepository.update({ id: oldMovie.id }, { ...parsedVideo, type })
+    const oldVideo = await this.#videoRepository.findOneBy({ name: parsedVideo.name, year: parsedVideo.year, type })
+    if (oldVideo) {
+      const toUpdateVideo = this.mergeVideo(oldVideo, parsedVideo)
+      const result = await this.#videoRepository.update({ id: oldVideo.id }, toUpdateVideo)
       if (result.affected)
-        return { ...oldMovie, ...parsedVideo, type }
+        return { ...oldVideo, ...parsedVideo, type }
       else
-        return oldMovie
+        return oldVideo
     }
     else {
       const video = new Video()
