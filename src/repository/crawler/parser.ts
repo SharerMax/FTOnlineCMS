@@ -39,7 +39,8 @@ export class Parser {
     if (genreList.length > 0) {
       for (const genre of genreList) {
         const trimGenre = genre.trim()
-        if (!trimGenre)
+        // skip invaild genre
+        if (!trimGenre || trimGenre.length === 1)
           continue
         genreSet.add(trimGenre)
       }
