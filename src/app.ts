@@ -1,10 +1,9 @@
+import 'dotenv/config'
 import 'reflect-metadata'
-import process from 'node:process'
-import { Provider } from './repository/entry/provider'
 import { Crawler } from './repository/crawler/crawler'
 import { CrawlerTask } from './repository/entry/crawler-task'
+import { Provider } from './repository/entry/provider'
 import { AppDataSource } from '@/repository/data-source'
-import 'dotenv/config'
 
 try {
   await AppDataSource.initialize()
