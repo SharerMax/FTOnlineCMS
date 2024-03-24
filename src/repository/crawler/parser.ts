@@ -33,16 +33,23 @@ export class Parser {
     return videoType
   }
 
+  isVaildGenre(genre: string) {
+    if (genre && genre.length > 1) {
+      if (genre.length > 2 && (genre.endsWith('片') || genre.endsWith('剧')))
+        return false
+      return true
+    }
+    return false
+  }
+
   parseVideoGenre(videoDetail: VideoDetail) {
     const genreList = videoDetail.vod_class?.split(',') ?? []
     const genreSet = new Set<string>()
     if (genreList.length > 0) {
       for (const genre of genreList) {
         const trimGenre = genre.trim()
-        // skip invaild genre
-        if (!trimGenre || trimGenre.length === 1)
-          continue
-        genreSet.add(trimGenre)
+        if (!this.isVaildGenre(trimGenre))
+          genreSet.add(trimGenre)
       }
     }
     return genreSet
