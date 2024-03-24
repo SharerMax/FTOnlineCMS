@@ -2,11 +2,16 @@
   "name": "ft-online-cms",
   "type": "module",
   "version": "1.0.0",
+  "private": true,
   "description": "",
   "author": "Max Zhao",
   "license": "ISC",
   "keywords": [],
   "main": "dist/app.js",
+  "engines": {
+    "node": "^20",
+    "pnpm": "^8.15.5"
+  },
   "scripts": {
     "dev": "tsup src/app.ts --watch --onSuccess \"DEBUG=* node dist/app.js\"",
     "build": "tsup src/app.ts"
@@ -24,7 +29,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^2.9.0",
     "@swc/core": "^1.4.8",
-    "@tsconfig/node20": "^20.1.2",
+    "@tsconfig/node20": "^20.1.3",
     "@types/debug": "^4.1.12",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^20.11.30",
