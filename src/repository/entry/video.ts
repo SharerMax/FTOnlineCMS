@@ -51,8 +51,8 @@ export class Video {
   genres: VideoGenre[]
 
   @CreateDateColumn()
-  createDateTime: Date
+  createDateTime?: Date
 
   @UpdateDateColumn()
-  updateDateTime: Date
+  updateDateTime?: Date
 }

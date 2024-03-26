@@ -1,3 +1,5 @@
+import process from 'node:process'
+import os from 'node:os'
 import debug from 'debug'
 import { mergeWith } from 'lodash-es'
 import { type $Fetch, ofetch } from 'ofetch'
@@ -12,6 +14,7 @@ import { Parser } from './parser'
 import type { ApiResponse, ParsedVideo, ParsedVideoEposide, VideoDetail, VideoType } from './types'
 
 const log = debug('crawler:')
+
 export class Crawler {
   readonly apiUrl: string
   readonly providerId: number
@@ -20,6 +23,9 @@ export class Crawler {
   #videoGenreRepository = AppDataSource.getRepository(VideoGenre)
   #genreRepository = AppDataSource.getRepository(Genre)
   #parser = new Parser()
+  #pageCount = 1
+  #pageNum = 1
+  #maxHandleNum = os.cpus().length + 1
   constructor(providerId: number, apiUrl: string) {
     this.apiUrl = apiUrl
     this.providerId = providerId
@@ -27,33 +33,53 @@ export class Crawler {
   }
 
   async run() {
-    let pageNum = 1
-    let pageCount = 1
-    do {
-      log('start fetch page:', pageNum)
+    const tasks: Promise<any>[] = []
+    for (let i = 0; i < this.#maxHandleNum; i++) {
+      tasks.push(this.next(this.#pageNum))
+      this.#pageNum++
+    }
+    await Promise.all(tasks)
+  }
+
+  async next(pageNum: number) {
+    try {
+      log('start fetch page: %d', pageNum)
       const response = await this.fetchContent(pageNum)
-      pageCount = Math.min(10, response.pagecount)
-      const videoList = response.list
-      for (const video of videoList) {
-        log('parse video start: ', video.vod_name)
-        const parsedVideo = this.#parser.parseVideo(video)
-        const parsedGenses = this.#parser.parseVideoGenre(video)
-        const parsedPoster = this.#parser.parseVideoPoster(video)
-        const parsedEpisoderList = this.#parser.parseVideoEpisode(video)
-        const parsedVideoType = this.#parser.parseVideoType(video)
-        const updatedVideo = await this.#updateVideo(parsedVideo, parsedVideoType)
-        await this.#updateGenre(updatedVideo, parsedGenses)
-        const updatedVideoProvider = await this.#updateVideoProvider(updatedVideo.id, this.providerId)
-        await this.#updateVideoEpisoder(updatedVideoProvider.id, parsedEpisoderList)
-        await this.#updateVideoPoster(updatedVideo.id, parsedPoster)
-        log('parse video end: ', video.vod_name)
+      this.#pageCount = Math.min(+(process.env.MAX_PAGE ?? 1), response.pagecount)
+      await this.updateContent(response.list)
+    }
+    catch (error) {
+      log('fetch page error: %s', error)
+    }
+    finally {
+      log('end fetch page: %d', pageNum)
+      if (this.#pageCount > pageNum) {
+        this.#pageNum++
+        this.next(this.#pageNum)
       }
-      pageNum++
-    } while (pageCount > pageNum)
+    }
   }
 
   fetchContent(pageNum: number) {
     return this.#fetch<ApiResponse<VideoDetail>>('/', { query: { ac: 'detail', pg: pageNum } })
+  }
+
+  async updateContent(videoList: VideoDetail[]) {
+    for (const [index, video] of videoList.entries()) {
+      log('parse video start(%d): %s --- %d', this.providerId, video.vod_name, index)
+      const parsedVideo = this.#parser.parseVideo(video)
+      const parsedGenses = this.#parser.parseVideoGenre(video)
+      const parsedPoster = this.#parser.parseVideoPoster(video)
+      const parsedEpisoderList = this.#parser.parseVideoEpisode(video)
+      const parsedVideoType = this.#parser.parseVideoType(video)
+
+      const updatedVideo = await this.#updateVideo(parsedVideo, parsedVideoType)
+      await this.#updateGenre(updatedVideo, parsedGenses)
+      const updatedVideoProvider = await this.#updateVideoProvider(updatedVideo.id, this.providerId)
+      await this.#updateVideoEpisoder(updatedVideoProvider.id, parsedEpisoderList)
+      await this.#updateVideoPoster(updatedVideo.id, parsedPoster)
+      log('parse video end(%d): %s --- %d', this.providerId, video.vod_name, index)
+    }
   }
 
   async #updateGenre(video: Video, genres: Set<string>) {
@@ -76,18 +102,22 @@ export class Crawler {
 
   mergeVideo(video: Video, newVideo: ParsedVideo): Video {
     return mergeWith(video, newVideo, (objValue, srcValue, key) => {
+      const a = key as keyof Video
+      if (a === 'createDateTime' || a === 'updateDateTime')
+        return void 0
       if (!srcValue)
         return objValue
+
       if (!objValue)
         return srcValue
 
       if (typeof objValue === 'string' && typeof srcValue === 'string') {
         if (srcValue.includes(objValue))
           return srcValue
+
         if (objValue.includes(srcValue))
           return objValue
       }
-      const a = key as keyof Video
       if (a === 'score')
         return Math.max(objValue, srcValue)
       if (a === 'director' || a === 'actors' || a === 'nickName') {
@@ -95,7 +125,7 @@ export class Crawler {
         ;(objValue as string).split(',').forEach(v => set.add(v))
         return Array.from(set).join(',')
       }
-      return objValue
+      return srcValue
     })
   }
 
@@ -103,6 +133,8 @@ export class Crawler {
     const oldVideo = await this.#videoRepository.findOneBy({ name: parsedVideo.name, year: parsedVideo.year, type })
     if (oldVideo) {
       const toUpdateVideo = this.mergeVideo(oldVideo, parsedVideo)
+      toUpdateVideo.createDateTime = undefined
+      toUpdateVideo.updateDateTime = undefined
       const result = await this.#videoRepository.update({ id: oldVideo.id }, toUpdateVideo)
       if (result.affected)
         return { ...oldVideo, ...parsedVideo, type }

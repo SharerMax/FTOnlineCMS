@@ -5,10 +5,10 @@ export class Parser {
     const video: ParsedVideo = {
       name: videoDetail.vod_name,
       nickName: videoDetail.vod_sub,
-      year: +videoDetail.vod_year,
+      year: Number.isNaN(+videoDetail.vod_year) ? 0 : +videoDetail.vod_year,
       language: videoDetail.vod_lang,
       area: videoDetail.vod_area,
-      score: +videoDetail.vod_score,
+      score: Number.isNaN(+videoDetail.vod_score) ? 0 : +videoDetail.vod_score,
       doubanId: '',
       director: videoDetail.vod_director === '未知' ? '' : videoDetail.vod_director,
       actors: videoDetail.vod_actor === '内详' ? '' : videoDetail.vod_actor,
@@ -28,14 +28,16 @@ export class Parser {
       videoType = 1
     else if (orginType.endsWith('综艺'))
       videoType = 3
-    else if (/动{画,漫}$/.test(orginType))
+    else if (/动[画漫]}$/.test(orginType))
       videoType = 4
     return videoType
   }
 
   isVaildGenre(genre: string) {
-    if (genre && genre.length > 1) {
+    if (genre && genre.length > 1 && genre.length < 4) {
       if (genre.length > 2 && (genre.endsWith('片') || genre.endsWith('剧')))
+        return false
+      if (/\w/.test(genre))
         return false
       return true
     }
@@ -43,15 +45,20 @@ export class Parser {
   }
 
   parseVideoGenre(videoDetail: VideoDetail) {
-    const genreList = videoDetail.vod_class?.split(',') ?? []
+    const vodClass = videoDetail.vod_class?.replace(/[;:]/g, '')
     const genreSet = new Set<string>()
-    if (genreList.length > 0) {
-      for (const genre of genreList) {
-        const trimGenre = genre.trim()
-        if (!this.isVaildGenre(trimGenre))
-          genreSet.add(trimGenre)
+    if (!vodClass) {
+      // spliter by ',' or '/'
+      const genreList = vodClass.split(/[,，\/\.。·\s]/g) ?? []
+      if (genreList.length > 0) {
+        for (const genre of genreList) {
+          const trimGenre = genre.trim()
+          if (this.isVaildGenre(trimGenre))
+            genreSet.add(trimGenre)
+        }
       }
     }
+
     return genreSet
   }
 

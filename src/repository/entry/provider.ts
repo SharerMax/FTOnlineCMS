@@ -23,8 +23,8 @@ export class Provider {
   enable: boolean
 
   @CreateDateColumn()
-  createDateTime: Date
+  createDateTime?: Date
 
   @UpdateDateColumn()
-  updateDateTime: Date
+  updateDateTime?: Date
 }
