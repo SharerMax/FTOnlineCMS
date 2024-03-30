@@ -29,10 +29,13 @@ export class Crawler {
   constructor(providerId: number, apiUrl: string) {
     this.apiUrl = apiUrl
     this.providerId = providerId
-    this.#fetch = ofetch.create({ baseURL: apiUrl, parseResponse: JSON.parse })
+    this.#fetch = ofetch.create({ baseURL: apiUrl, parseResponse: JSON.parse, retry: 3, retryDelay: 1000, async onRequest({ request, options }) {
+      log('[fetch request]', request, options)
+    } })
   }
 
   async run() {
+    // parallelLimit(this, this.#maxHandleNum)
     const tasks: Promise<any>[] = []
     for (let i = 0; i < this.#maxHandleNum; i++) {
       tasks.push(this.next(this.#pageNum))
@@ -41,23 +44,41 @@ export class Crawler {
     await Promise.all(tasks)
   }
 
+  // [Symbol.asyncIterator]() {
+  //   const current = this.#pageNum
+  //   const last = this.#pageCount
+  //   const nextPage = this.next
+  //   return {
+  //     current,
+  //     last,
+  //     async next() {
+  //       if (last > current) {
+  //         return {
+  //           done: true,
+  //         }
+  //       }
+  //       return {
+  //         value: await nextPage(current),
+  //         done: false,
+  //       }
+  //     },
+  //   }
+  // }
+
   async next(pageNum: number) {
     try {
-      log('start fetch page: %d', pageNum)
+      log('start fetch page(%d): %d', this.providerId, pageNum)
       const response = await this.fetchContent(pageNum)
       this.#pageCount = Math.min(+(process.env.MAX_PAGE ?? 1), response.pagecount)
       await this.updateContent(response.list)
     }
     catch (error) {
-      log('fetch page error: %s', error)
+      log('fetch page error(%d): %s', this.providerId, error)
     }
-    finally {
-      log('end fetch page: %d', pageNum)
-      if (this.#pageCount > pageNum) {
-        this.#pageNum++
-        this.next(this.#pageNum)
-      }
-    }
+    log('end fetch page(%d): %d', this.providerId, pageNum)
+    this.#pageNum++
+    if (this.#pageCount > this.#pageNum)
+      await this.next(this.#pageNum)
   }
 
   fetchContent(pageNum: number) {

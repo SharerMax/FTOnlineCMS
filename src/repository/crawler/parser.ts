@@ -12,7 +12,7 @@ export class Parser {
       doubanId: '',
       director: videoDetail.vod_director === '未知' ? '' : videoDetail.vod_director,
       actors: videoDetail.vod_actor === '内详' ? '' : videoDetail.vod_actor,
-      description: videoDetail.vod_content,
+      description: videoDetail.vod_content.replace(/<[^>]+>/g, '').trim(),
       remarks: videoDetail.vod_remarks,
     }
     return video
@@ -47,7 +47,7 @@ export class Parser {
   parseVideoGenre(videoDetail: VideoDetail) {
     const vodClass = videoDetail.vod_class?.replace(/[;:]/g, '')
     const genreSet = new Set<string>()
-    if (!vodClass) {
+    if (vodClass) {
       // spliter by ',' or '/'
       const genreList = vodClass.split(/[,，\/\.。·\s]/g) ?? []
       if (genreList.length > 0) {
@@ -58,7 +58,6 @@ export class Parser {
         }
       }
     }
-
     return genreSet
   }
 

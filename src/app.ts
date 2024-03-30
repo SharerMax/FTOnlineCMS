@@ -10,8 +10,7 @@ try {
   await AppDataSource.initialize()
   const providerRepository = AppDataSource.getRepository(Provider)
   const providers = await providerRepository.find({ where: { enable: true } })
-  const startTime = performance.now()
-  console.log('start time: ', startTime)
+  // const startTime = performance.now()
   if (providers.length > 0) {
     const crawlerTaskRepository = AppDataSource.getRepository(CrawlerTask)
     for (const provider of providers) {
@@ -40,9 +39,7 @@ try {
       }
     }
   }
-  const endTime = performance.now()
-  console.log('end time: ', endTime)
-  console.log('total time: ', endTime - startTime)
+  // const endTime = performance.now()
   await AppDataSource.destroy()
   process.exit(0)
 }
