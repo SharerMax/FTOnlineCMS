@@ -1,4 +1,5 @@
-import type { ParsedVideo, ParsedVideoEposide as ParsedVideoEpisode, VideoDetail, VideoType } from './types'
+import type { ParsedVideo, ParsedVideoEposide as ParsedVideoEpisode, VideoDetail } from './types'
+import { VideoType } from '@/repository/types'
 
 export class Parser {
   parseVideo(videoDetail: VideoDetail) {
@@ -21,15 +22,15 @@ export class Parser {
   parseVideoType(videoDetail: VideoDetail): VideoType {
     const orginType = videoDetail.type_name ?? ''
     // 1 电影 2 电视剧 3 综艺 4 动漫
-    let videoType: VideoType = 1
+    let videoType: VideoType = VideoType.Other
     if (orginType.endsWith('剧'))
-      videoType = 2
+      videoType = VideoType.TV
     else if (orginType.endsWith('片'))
-      videoType = 1
+      videoType = VideoType.Movie
     else if (orginType.endsWith('综艺'))
-      videoType = 3
+      videoType = VideoType.VarietyShow
     else if (/动[画漫]}$/.test(orginType))
-      videoType = 4
+      videoType = VideoType.Animation
     return videoType
   }
 

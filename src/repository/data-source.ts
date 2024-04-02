@@ -1,3 +1,4 @@
+import process from 'node:process'
 import { DataSource } from 'typeorm'
 import { Episode } from './entry/episode'
 import { Genre } from './entry/genre'
@@ -12,7 +13,7 @@ export const AppDataSource = new DataSource({
   type: 'sqlite',
   database: './db/db.sqlite',
   synchronize: true,
-  logging: false,
+  logging: process.env.NODE_ENV === 'development',
   entities: [Video, Episode, Poster, Provider, VideoGenre, Genre, VideoProvider, CrawlerTask],
   // migrations: ['src/migration/*.ts'],
   // subscribers: ['src/subscriber/*.ts'],

@@ -1,5 +1,5 @@
-import type { Episode } from '../entry/episode'
-import type { Video } from '../entry/video'
+import type { Episode } from '../repository/entry/episode'
+import type { Video } from '../repository/entry/video'
 
 export interface VideoBrief {
   vod_id: string
@@ -44,10 +44,3 @@ export interface ApiResponse<T> {
 
 export type ParsedVideo = Omit<Video, 'id' | 'createDateTime' | 'updateDateTime' | 'genres' | 'type'>
 export type ParsedVideoEposide = Omit<Episode, 'id' | 'videoProviderId'>
-
-export type VideoTypeTV = 1
-export type VideoTypeMovie = 2
-export type VideoTypeVarietyShow = 3
-export type VideoTypeCartoon = 4
-
-export type VideoType = VideoTypeTV | VideoTypeMovie | VideoTypeVarietyShow | VideoTypeCartoon

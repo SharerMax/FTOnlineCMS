@@ -3,15 +3,17 @@ import os from 'node:os'
 import debug from 'debug'
 import { mergeWith } from 'lodash-es'
 import { type $Fetch, ofetch } from 'ofetch'
-import { AppDataSource } from '../data-source'
-import { Episode } from '../entry/episode'
-import { Genre } from '../entry/genre'
-import { Poster } from '../entry/poster'
-import { Video } from '../entry/video'
-import { VideoGenre } from '../entry/video-genre'
-import { VideoProvider } from '../entry/video-provider'
+import type { EntityManager } from 'typeorm'
+import { AppDataSource } from '../repository/data-source'
+import { Episode } from '../repository/entry/episode'
+import { Genre } from '../repository/entry/genre'
+import { Poster } from '../repository/entry/poster'
+import { Video } from '../repository/entry/video'
+import { VideoGenre } from '../repository/entry/video-genre'
+import { VideoProvider } from '../repository/entry/video-provider'
 import { Parser } from './parser'
-import type { ApiResponse, ParsedVideo, ParsedVideoEposide, VideoDetail, VideoType } from './types'
+import type { ApiResponse, ParsedVideo, ParsedVideoEposide, VideoDetail } from './types'
+import type { VideoType } from '@/repository/types'
 
 const log = debug('crawler:')
 
@@ -19,9 +21,6 @@ export class Crawler {
   readonly apiUrl: string
   readonly providerId: number
   #fetch: $Fetch
-  #videoRepository = AppDataSource.getRepository(Video)
-  #videoGenreRepository = AppDataSource.getRepository(VideoGenre)
-  #genreRepository = AppDataSource.getRepository(Genre)
   #parser = new Parser()
   #pageCount = 1
   #pageNum = 1
@@ -94,27 +93,38 @@ export class Crawler {
       const parsedEpisoderList = this.#parser.parseVideoEpisode(video)
       const parsedVideoType = this.#parser.parseVideoType(video)
 
-      const updatedVideo = await this.#updateVideo(parsedVideo, parsedVideoType)
-      await this.#updateGenre(updatedVideo, parsedGenses)
-      const updatedVideoProvider = await this.#updateVideoProvider(updatedVideo.id, this.providerId)
-      await this.#updateVideoEpisoder(updatedVideoProvider.id, parsedEpisoderList)
-      await this.#updateVideoPoster(updatedVideo.id, parsedPoster)
+      // await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
+      //   const updatedVideo = await this.#updateVideo(transactionalEntityManager, parsedVideo, parsedVideoType)
+      //   await this.#updateGenre(transactionalEntityManager, updatedVideo, parsedGenses)
+      //   const updatedVideoProvider = await this.#updateVideoProvider(transactionalEntityManager, updatedVideo.id, this.providerId)
+      //   await this.#updateVideoEpisoder(transactionalEntityManager, updatedVideoProvider.id, parsedEpisoderList)
+      //   await this.#updateVideoPoster(transactionalEntityManager, updatedVideo.id, parsedPoster)
+      // })
+      const entityManager = AppDataSource.createEntityManager()
+      const updatedVideo = await this.#updateVideo(entityManager, parsedVideo, parsedVideoType)
+      await this.#updateGenre(entityManager, updatedVideo, parsedGenses)
+      const updatedVideoProvider = await this.#updateVideoProvider(entityManager, updatedVideo.id, this.providerId)
+      await this.#updateVideoEpisoder(entityManager, updatedVideoProvider.id, parsedEpisoderList)
+      await this.#updateVideoPoster(entityManager, updatedVideo.id, parsedPoster)
+
       log('parse video end(%d): %s --- %d', this.providerId, video.vod_name, index)
     }
   }
 
-  async #updateGenre(video: Video, genres: Set<string>) {
+  async #updateGenre(entityManager: EntityManager, video: Video, genres: Set<string>) {
     const hasUpdateGenre: VideoGenre[] = []
     for (const genre of genres) {
       const trimGenre = genre.trim()
       if (!trimGenre)
         continue
-      let savedGenre = await this.#genreRepository.findOneBy({ name: trimGenre })
+      const genreRepository = entityManager.getRepository(Genre)
+      let savedGenre = await genreRepository.findOneBy({ name: trimGenre })
       if (!savedGenre)
-        savedGenre = await this.#genreRepository.save({ name: trimGenre })
-      const savedVideoGenre = await this.#videoGenreRepository.findOneBy({ video, genre: savedGenre })
+        savedGenre = await genreRepository.save({ name: trimGenre })
+      const videoGenreRepository = entityManager.getRepository(VideoGenre)
+      const savedVideoGenre = await videoGenreRepository.findOneBy({ video: { id: video.id }, genre: { id: savedGenre.id } })
       if (!savedVideoGenre) {
-        const savedVideoGenre = await this.#videoGenreRepository.save({ video, genre: savedGenre })
+        const savedVideoGenre = await videoGenreRepository.save({ video, genre: savedGenre })
         hasUpdateGenre.push(savedVideoGenre)
       }
     }
@@ -150,13 +160,14 @@ export class Crawler {
     })
   }
 
-  async #updateVideo(parsedVideo: ParsedVideo, type: VideoType) {
-    const oldVideo = await this.#videoRepository.findOneBy({ name: parsedVideo.name, year: parsedVideo.year, type })
+  async #updateVideo(entityManager: EntityManager, parsedVideo: ParsedVideo, type: VideoType) {
+    const videoRepository = entityManager.getRepository(Video)
+    const oldVideo = await videoRepository.findOneBy({ name: parsedVideo.name, year: parsedVideo.year, type })
     if (oldVideo) {
       const toUpdateVideo = this.mergeVideo(oldVideo, parsedVideo)
       toUpdateVideo.createDateTime = undefined
       toUpdateVideo.updateDateTime = undefined
-      const result = await this.#videoRepository.update({ id: oldVideo.id }, toUpdateVideo)
+      const result = await videoRepository.update({ id: oldVideo.id }, toUpdateVideo)
       if (result.affected)
         return { ...oldVideo, ...parsedVideo, type }
       else
@@ -166,26 +177,26 @@ export class Crawler {
       const video = new Video()
       Object.assign(video, parsedVideo)
       video.type = type
-      return await this.#videoRepository.save(video)
+      return await videoRepository.save(video)
     }
   }
 
-  async #updateVideoProvider(videoId: number, providerId: number) {
-    const videoProviderRepository = AppDataSource.getRepository(VideoProvider)
+  async #updateVideoProvider(entityManager: EntityManager, videoId: number, providerId: number) {
+    const videoProviderRepository = entityManager.getRepository(VideoProvider)
     let savedVideoProvider = await videoProviderRepository.findOneBy({ videoId, providerId })
     if (!savedVideoProvider)
       savedVideoProvider = await videoProviderRepository.save({ videoId, providerId })
     return savedVideoProvider
   }
 
-  async #updateVideoEpisoder(videoProviderId: number, parsedEpisodes: ParsedVideoEposide[]) {
+  async #updateVideoEpisoder(entityManager: EntityManager, videoProviderId: number, parsedEpisodes: ParsedVideoEposide[]) {
     const episodeList: Episode[] = []
     for (const parsedEpisode of parsedEpisodes) {
       // skip invaild url
       if (!parsedEpisode.name || !parsedEpisode.url)
         continue
 
-      const episodeRepository = AppDataSource.getRepository(Episode)
+      const episodeRepository = entityManager.getRepository(Episode)
       const oldEpisode = await episodeRepository.findOneBy({ videoProviderId, number: parsedEpisode.number })
       if (oldEpisode) {
         await episodeRepository.update({ id: oldEpisode.id }, parsedEpisode)
@@ -198,11 +209,11 @@ export class Crawler {
     return episodeList
   }
 
-  async #updateVideoPoster(videoProviderId: number, posterUrl: string) {
+  async #updateVideoPoster(entityManager: EntityManager, videoProviderId: number, posterUrl: string) {
     const poster = new Poster()
     poster.videoProviderId = videoProviderId
     poster.url = posterUrl
-    const posterRepository = AppDataSource.getRepository(Poster)
+    const posterRepository = entityManager.getRepository(Poster)
     const oldPoster = await posterRepository.findOneBy({ videoProviderId })
     if (oldPoster) {
       await posterRepository.update({ id: oldPoster.id }, poster)

@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
-import type { VideoType } from '../crawler/types'
+import type { VideoType } from '../types'
 import { VideoGenre } from './video-genre'
 
 @Entity()
