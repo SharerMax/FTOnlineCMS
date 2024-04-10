@@ -40,6 +40,9 @@ export class Parser {
         return false
       if (/\w/.test(genre))
         return false
+      if (/其[他它]/.test(genre))
+        return false
+
       return true
     }
     return false

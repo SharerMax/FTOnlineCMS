@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { Video } from './video'
+import { Provider } from './provider'
 
 @Entity()
 export class Episode {
@@ -11,8 +13,13 @@ export class Episode {
   @Column()
   number: number
 
-  @Column()
-  videoProviderId: number
+  @ManyToOne(() => Video, { nullable: false })
+  @JoinColumn({ name: 'videoId' })
+  video: Video
+
+  @ManyToOne(() => Provider, { nullable: false })
+  @JoinColumn({ name: 'providerId' })
+  provider: Provider
 
   @Column()
   url: string

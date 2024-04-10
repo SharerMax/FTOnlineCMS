@@ -1,6 +1,6 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { Video } from './video'
+import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { Genre } from './genre'
+import { Video } from './video'
 
 /**
  * 风格
@@ -11,11 +11,11 @@ export class VideoGenre {
   @PrimaryGeneratedColumn()
   id: number
 
-  @ManyToOne(() => Genre)
+  @ManyToOne(() => Genre, { nullable: false })
   @JoinColumn({ name: 'genreId' })
   genre: Genre
 
-  @ManyToOne(() => Video, video => video.genres)
+  @ManyToOne(() => Video, video => video.genres, { nullable: false })
   @JoinColumn({ name: 'videoId' })
   video: Video
 }

@@ -42,5 +42,5 @@ export interface ApiResponse<T> {
   list: T[]
 }
 
-export type ParsedVideo = Omit<Video, 'id' | 'createDateTime' | 'updateDateTime' | 'genres' | 'type'>
-export type ParsedVideoEposide = Omit<Episode, 'id' | 'videoProviderId'>
+export type ParsedVideo = Omit<Video, 'id' | 'createDateTime' | 'updateDateTime' | 'genres' | 'type' | 'poster'>
+export type ParsedVideoEposide = Omit<Episode, 'id' | 'video' | 'provider'>

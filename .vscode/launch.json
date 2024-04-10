@@ -8,7 +8,6 @@
       "name": "app",
       "type": "node",
       "request": "launch",
-
       // build:app
       "preLaunchTask": "build:app",
       // Debug current file in VSCode

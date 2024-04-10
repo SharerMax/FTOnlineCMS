@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 import type { VideoType } from '../types'
 import { VideoGenre } from './video-genre'
+import { Poster } from './poster'
 
 @Entity()
 export class Video {
@@ -49,6 +50,10 @@ export class Video {
   @OneToMany(() => VideoGenre, videoGenre => videoGenre.video)
   @JoinColumn({ name: 'videoGenreId' })
   genres: VideoGenre[]
+
+  @OneToMany(() => Poster, poster => poster.video)
+  @JoinColumn({ name: 'posterId' })
+  poster: Poster[]
 
   @CreateDateColumn()
   createDateTime?: Date

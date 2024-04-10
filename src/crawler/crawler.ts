@@ -103,8 +103,8 @@ export class Crawler {
       const entityManager = AppDataSource.createEntityManager()
       const updatedVideo = await this.#updateVideo(entityManager, parsedVideo, parsedVideoType)
       await this.#updateGenre(entityManager, updatedVideo, parsedGenses)
-      const updatedVideoProvider = await this.#updateVideoProvider(entityManager, updatedVideo.id, this.providerId)
-      await this.#updateVideoEpisoder(entityManager, updatedVideoProvider.id, parsedEpisoderList)
+      // const updatedVideoProvider = await this.#updateVideoProvider(entityManager, updatedVideo.id, this.providerId)
+      await this.#updateVideoEpisoder(entityManager, updatedVideo.id, parsedEpisoderList)
       await this.#updateVideoPoster(entityManager, updatedVideo.id, parsedPoster)
 
       log('parse video end(%d): %s --- %d', this.providerId, video.vod_name, index)
@@ -181,15 +181,15 @@ export class Crawler {
     }
   }
 
-  async #updateVideoProvider(entityManager: EntityManager, videoId: number, providerId: number) {
-    const videoProviderRepository = entityManager.getRepository(VideoProvider)
-    let savedVideoProvider = await videoProviderRepository.findOneBy({ videoId, providerId })
-    if (!savedVideoProvider)
-      savedVideoProvider = await videoProviderRepository.save({ videoId, providerId })
-    return savedVideoProvider
-  }
+  // async #updateVideoProvider(entityManager: EntityManager, videoId: number, providerId: number) {
+  //   const videoProviderRepository = entityManager.getRepository(VideoProvider)
+  //   let savedVideoProvider = await videoProviderRepository.findOneBy({ video: { id: videoId }, provider: { id: providerId } })
+  //   if (!savedVideoProvider)
+  //     savedVideoProvider = await videoProviderRepository.save({ video: { id: videoId }, provider: { id: providerId } })
+  //   return savedVideoProvider
+  // }
 
-  async #updateVideoEpisoder(entityManager: EntityManager, videoProviderId: number, parsedEpisodes: ParsedVideoEposide[]) {
+  async #updateVideoEpisoder(entityManager: EntityManager, videoId: number, parsedEpisodes: ParsedVideoEposide[]) {
     const episodeList: Episode[] = []
     for (const parsedEpisode of parsedEpisodes) {
       // skip invaild url
@@ -197,30 +197,30 @@ export class Crawler {
         continue
 
       const episodeRepository = entityManager.getRepository(Episode)
-      const oldEpisode = await episodeRepository.findOneBy({ videoProviderId, number: parsedEpisode.number })
+      const oldEpisode = await episodeRepository.findOneBy({ video: { id: videoId }, provider: { id: this.providerId }, number: parsedEpisode.number })
       if (oldEpisode) {
         await episodeRepository.update({ id: oldEpisode.id }, parsedEpisode)
         episodeList.push(episodeRepository.merge(oldEpisode, parsedEpisode))
       }
       else {
-        episodeList.push(await episodeRepository.save(episodeRepository.merge(new Episode(), parsedEpisode, { videoProviderId })))
+        episodeList.push(await episodeRepository.save(episodeRepository.merge(new Episode(), parsedEpisode, { video: { id: videoId }, provider: { id: this.providerId } })))
       }
     }
     return episodeList
   }
 
-  async #updateVideoPoster(entityManager: EntityManager, videoProviderId: number, posterUrl: string) {
+  async #updateVideoPoster(entityManager: EntityManager, videoId: number, posterUrl: string) {
     const poster = new Poster()
-    poster.videoProviderId = videoProviderId
     poster.url = posterUrl
     const posterRepository = entityManager.getRepository(Poster)
-    const oldPoster = await posterRepository.findOneBy({ videoProviderId })
+    const oldPoster = await posterRepository.findOneBy({ video: { id: videoId }, provider: { id: this.providerId } })
     if (oldPoster) {
       await posterRepository.update({ id: oldPoster.id }, poster)
       poster.id = oldPoster.id
     }
     else {
-      Object.assign(poster, await posterRepository.save(poster))
+      // not null
+      Object.assign(poster, await posterRepository.save({ ...poster, video: { id: videoId }, provider: { id: this.providerId } }))
     }
     return poster
   }

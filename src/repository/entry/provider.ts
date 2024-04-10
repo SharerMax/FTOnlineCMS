@@ -13,6 +13,7 @@ export class Provider {
 
   @Column({
     nullable: true,
+    select: false,
   })
   apiKey?: string
 

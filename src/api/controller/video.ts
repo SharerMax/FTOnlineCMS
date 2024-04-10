@@ -1,11 +1,15 @@
-import { createRouter, defineEventHandler, getValidatedQuery, getValidatedRouterParams } from 'h3'
-import { videoDetailSchema, videoEpisodeListSchema, videoPageListSchema, videoProviderSchema } from '../schema/video'
-import { getProvidersByVideo, getVideList, getVideoById, getVideoEposideList } from '../service/video'
+import { createError, createRouter, defineEventHandler, getValidatedQuery, getValidatedRouterParams } from 'h3'
+import { videoDetailSchema, videoEpisodeListSchema, videoPageListSchema } from '../schema/video'
+import { getVideList, getVideoById, getVideoEposideList } from '../service/video'
+import { VideoType } from '@/repository/types'
 
 const videoRouter = createRouter()
 // video list
 videoRouter.get('/list', defineEventHandler(async (event) => {
   const query = await getValidatedQuery(event, videoPageListSchema.parse)
+  if (query.type && !Object.values(VideoType).includes(query.type))
+    throw createError({ statusCode: 400, statusMessage: 'type is invalid' })
+
   return getVideList(query)
 }))
 
@@ -19,12 +23,6 @@ videoRouter.get('/detail/:id', defineEventHandler(async (event) => {
 videoRouter.get('/episode', defineEventHandler(async (event) => {
   const param = await getValidatedQuery(event, videoEpisodeListSchema.parse)
   return getVideoEposideList(param)
-}))
-
-// video provider
-videoRouter.get('/provider', defineEventHandler(async (event) => {
-  const query = await getValidatedQuery(event, videoProviderSchema.parse)
-  return getProvidersByVideo(query)
 }))
 
 export { videoRouter }
