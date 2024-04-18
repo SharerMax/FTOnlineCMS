@@ -1,3 +1,4 @@
+import { GENRE_BLOCK_LIST } from './constant'
 import type { ParsedVideo, ParsedVideoEposide as ParsedVideoEpisode, VideoDetail } from './types'
 import { VideoType } from '@/repository/types'
 
@@ -7,8 +8,8 @@ export class Parser {
       name: videoDetail.vod_name,
       nickName: videoDetail.vod_sub,
       year: Number.isNaN(+videoDetail.vod_year) ? 0 : +videoDetail.vod_year,
-      language: videoDetail.vod_lang,
-      area: videoDetail.vod_area,
+      language: this.normalizedLanguage(videoDetail.vod_lang),
+      area: this.normalizedArea(videoDetail.vod_area),
       score: Number.isNaN(+videoDetail.vod_score) ? 0 : +videoDetail.vod_score,
       doubanId: '',
       director: videoDetail.vod_director === '未知' ? '' : videoDetail.vod_director,
@@ -17,6 +18,30 @@ export class Parser {
       remarks: videoDetail.vod_remarks,
     }
     return video
+  }
+
+  normalizedLanguage(language: string) {
+    if (!language)
+      return ''
+    if (language === '国语' || language === '普通话' || language === '汉语' || language === '汉语普通话')
+      return '国语'
+    if (language === '其他' || language === '其它')
+      return ''
+    return language
+  }
+
+  normalizedArea(area: string) {
+    if (!area)
+      return ''
+    if (area === '中国大陆' || '大陆' || '中国')
+      return '中国大陆'
+    if (area === '中国香港' || '香港')
+      return '香港'
+    if (area === '中国台湾' || '台湾')
+      return '台湾'
+    if (area === '中国澳门' || '澳门')
+      return '澳门'
+    return area
   }
 
   parseVideoType(videoDetail: VideoDetail): VideoType {
@@ -35,14 +60,21 @@ export class Parser {
   }
 
   isVaildGenre(genre: string) {
+    if (GENRE_BLOCK_LIST.includes(genre))
+      return false
+    // 风格类型 最少2个字 至多3个字
     if (genre && genre.length > 1 && genre.length < 4) {
-      if (genre.length > 2 && (genre.endsWith('片') || genre.endsWith('剧')))
-        return false
+      // 空白字符
       if (/\w/.test(genre))
         return false
       if (/其[他它]/.test(genre))
         return false
-
+      // 过滤以国家命名的风格
+      if (genre.endsWith('国'))
+        return false
+      // 过滤  xx片 xx剧
+      if (genre.length > 2 && (genre.endsWith('片') || genre.endsWith('剧')))
+        return false
       return true
     }
     return false
