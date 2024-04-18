@@ -1,10 +1,10 @@
 import { createServer } from 'node:http'
 import process from 'node:process'
-import { appendCorsHeaders, createApp, createRouter, defaultContentType, defineEventHandler, handleCors, isPreflightRequest, toNodeListener, useBase } from 'h3'
 import debug from 'debug'
-import { videoRouter } from './controller/video'
-import { providerRouter } from './controller/provider'
+import { appendCorsHeaders, createApp, createRouter, defaultContentType, defineEventHandler, toNodeListener, useBase } from 'h3'
 import { genreRouter } from './controller/genre'
+import { providerRouter } from './controller/provider'
+import { videoRouter } from './controller/video'
 
 const log = debug('api:')
 const app = createApp({
