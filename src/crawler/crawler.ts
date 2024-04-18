@@ -4,6 +4,7 @@ import debug from 'debug'
 import { mergeWith } from 'lodash-es'
 import { type $Fetch, ofetch } from 'ofetch'
 import type { EntityManager } from 'typeorm'
+import pLimit from 'p-limit'
 import { AppDataSource } from '../repository/data-source'
 import { Episode } from '../repository/entry/episode'
 import { Genre } from '../repository/entry/genre'
@@ -25,6 +26,7 @@ export class Crawler {
   #pageCount = 1
   #pageNum = 1
   #maxHandleNum = os.cpus().length + 1
+  #syncTask = pLimit(1)
   constructor(providerId: number, apiUrl: string) {
     this.apiUrl = apiUrl
     this.providerId = providerId
@@ -85,6 +87,8 @@ export class Crawler {
   }
 
   async updateContent(videoList: VideoDetail[]) {
+    const entityManager = AppDataSource.createEntityManager()
+
     for (const [index, video] of videoList.entries()) {
       log('parse video start(%d): %s --- %d', this.providerId, video.vod_name, index)
       const parsedVideo = this.#parser.parseVideo(video)
@@ -100,14 +104,14 @@ export class Crawler {
       //   await this.#updateVideoEpisoder(transactionalEntityManager, updatedVideoProvider.id, parsedEpisoderList)
       //   await this.#updateVideoPoster(transactionalEntityManager, updatedVideo.id, parsedPoster)
       // })
-      const entityManager = AppDataSource.createEntityManager()
-      const updatedVideo = await this.#updateVideo(entityManager, parsedVideo, parsedVideoType)
-      await this.#updateGenre(entityManager, updatedVideo, parsedGenses)
-      // const updatedVideoProvider = await this.#updateVideoProvider(entityManager, updatedVideo.id, this.providerId)
-      await this.#updateVideoEpisoder(entityManager, updatedVideo.id, parsedEpisoderList)
-      await this.#updateVideoPoster(entityManager, updatedVideo.id, parsedPoster)
-
-      log('parse video end(%d): %s --- %d', this.providerId, video.vod_name, index)
+      await this.#syncTask(async () => {
+        const updatedVideo = await this.#updateVideo(entityManager, parsedVideo, parsedVideoType)
+        await this.#updateGenre(entityManager, updatedVideo, parsedGenses)
+        // const updatedVideoProvider = await this.#updateVideoProvider(entityManager, updatedVideo.id, this.providerId)
+        await this.#updateVideoEpisoder(entityManager, updatedVideo.id, parsedEpisoderList)
+        await this.#updateVideoPoster(entityManager, updatedVideo.id, parsedPoster)
+        log('parse video end(%d): %s --- %d', this.providerId, video.vod_name, index)
+      })
     }
   }
 
