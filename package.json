@@ -9,8 +9,8 @@
   "keywords": [],
   "main": "dist/app.js",
   "engines": {
-    "node": "^20",
-    "pnpm": ">=8.15.5"
+    "node": "^20.0.0",
+    "pnpm": "^9.0.0"
   },
   "scripts": {
     "dev": "tsup --env.NODE_ENV development",
@@ -27,11 +27,11 @@
     "reflect-metadata": "^0.2.2",
     "sqlite3": "^5.1.7",
     "typeorm": "^0.3.20",
-    "zod": "^3.22.4"
+    "zod": "^3.22.5"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.14.0",
-    "@swc/core": "^1.4.15",
+    "@antfu/eslint-config": "^2.15.0",
+    "@swc/core": "^1.4.16",
     "@tsconfig/node20": "^20.1.4",
     "@types/debug": "^4.1.12",
     "@types/lodash-es": "^4.17.12",
