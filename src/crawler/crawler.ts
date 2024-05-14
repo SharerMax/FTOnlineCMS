@@ -38,7 +38,7 @@ export class Crawler {
   async run() {
     // parallelLimit(this, this.#maxHandleNum)
     const tasks: Promise<any>[] = []
-    for (let i = 0; i < this.#maxHandleNum; i++) {
+    for (let i = 0; i <= this.#maxHandleNum; i++) {
       tasks.push(this.next(this.#pageNum))
       this.#pageNum++
     }
