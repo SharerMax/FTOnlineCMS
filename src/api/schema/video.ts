@@ -4,7 +4,7 @@ import { VideoType } from '@/repository/types'
 
 export const videoPageListSchema = z.object({
   page: z.number({ coerce: true }).int().positive(), // > 0
-  pageSize: z.number({ coerce: true }).int().positive().lte(20).optional(), // <= 20
+  pageSize: z.number({ coerce: true }).int().positive().lte(50).optional(), // <= 50
   name: z.string().optional(),
   type: z.number({ coerce: true }).int().positive().optional(), // <= 4   1: 电影 2: 电视剧 3: 综艺 4: 动漫
   year: z.number({ coerce: true }).int().positive().lte(2024).optional(), // <= 2024
