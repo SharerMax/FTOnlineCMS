@@ -10,7 +10,7 @@ export default defineConfig((options) => {
       dts: false,
       format: ['esm'],
       watch: true,
-      onSuccess: 'DEBUG=* node dist/app.js --enable-source-maps',
+      onSuccess: 'node dist/app.js --enable-source-maps',
     }
   }
   return {
