@@ -1,7 +1,7 @@
 import type { ProviderQuery, VideoProviderListQuery } from '../types/provider'
-import { makeResult } from '../utils'
 import { AppDataSource } from '@/repository/data-source'
 import { Provider } from '@/repository/entry/provider'
+import { makeResult } from '../utils'
 
 const providerRepository = AppDataSource.getRepository(Provider)
 

@@ -1,4 +1,4 @@
-import { createRouter, defineEventHandler, getValidatedQuery, getValidatedRouterParams } from 'h3'
+import { createRouter, defineEventHandler, getValidatedRouterParams } from 'h3'
 import { commomIntIdSchema, videoProviderByVideoSchema } from '../schema'
 import { getProvider, getProviderList, getProvidersByVideo } from '../service/provider'
 

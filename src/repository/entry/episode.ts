@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { Video } from './video'
 import { Provider } from './provider'
+import { Video } from './video'
 
 @Entity()
 export class Episode {

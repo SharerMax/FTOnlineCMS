@@ -1,6 +1,5 @@
 import z from 'zod'
 import { commomIntIdSchema } from '.'
-import { VideoType } from '@/repository/types'
 
 export const videoPageListSchema = z.object({
   page: z.number({ coerce: true }).int().positive(), // > 0

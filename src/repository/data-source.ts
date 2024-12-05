@@ -1,12 +1,12 @@
 import process from 'node:process'
 import { DataSource } from 'typeorm'
+import { CrawlerTask } from './entry/crawler-task'
 import { Episode } from './entry/episode'
 import { Genre } from './entry/genre'
 import { Poster } from './entry/poster'
 import { Provider } from './entry/provider'
 import { Video } from './entry/video'
 import { VideoGenre } from './entry/video-genre'
-import { CrawlerTask } from './entry/crawler-task'
 
 export const AppDataSource = new DataSource({
   type: 'sqlite',

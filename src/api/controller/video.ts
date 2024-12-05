@@ -1,7 +1,7 @@
+import { VideoType } from '@/repository/types'
 import { createError, createRouter, defineEventHandler, getValidatedQuery, getValidatedRouterParams } from 'h3'
 import { videoDetailSchema, videoEpisodeListSchema, videoPageListSchema } from '../schema/video'
 import { getVideList, getVideoById, getVideoEposideList } from '../service/video'
-import { VideoType } from '@/repository/types'
 
 const videoRouter = createRouter()
 // video list

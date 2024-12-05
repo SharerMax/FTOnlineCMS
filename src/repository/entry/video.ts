@@ -1,7 +1,7 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 import type { VideoType } from '../types'
-import { VideoGenre } from './video-genre'
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 import { Poster } from './poster'
+import { VideoGenre } from './video-genre'
 
 @Entity()
 export class Video {

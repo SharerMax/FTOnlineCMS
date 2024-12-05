@@ -1,6 +1,6 @@
-import { makeResult } from '../utils'
 import { AppDataSource } from '@/repository/data-source'
 import { Genre } from '@/repository/entry/genre'
+import { makeResult } from '../utils'
 
 const genreRepository = AppDataSource.getRepository(Genre)
 export async function getGenreList() {

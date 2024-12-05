@@ -1,6 +1,6 @@
-import { GENRE_BLOCK_LIST } from './constant'
 import type { ParsedVideo, ParsedVideoEposide as ParsedVideoEpisode, VideoDetail } from './types'
 import { VideoType } from '@/repository/types'
+import { GENRE_BLOCK_LIST } from './constant'
 
 export class Parser {
   parseVideo(videoDetail: VideoDetail) {
@@ -54,7 +54,7 @@ export class Parser {
       videoType = VideoType.Movie
     else if (orginType.endsWith('综艺'))
       videoType = VideoType.VarietyShow
-    else if (/动[画漫]}$/.test(orginType))
+    else if (/动[画漫]\}$/.test(orginType))
       videoType = VideoType.Animation
     return videoType
   }
@@ -85,7 +85,7 @@ export class Parser {
     const genreSet = new Set<string>()
     if (vodClass) {
       // spliter by ',' or '/'
-      const genreList = vodClass.split(/[,，\/\.。·\s]/g) ?? []
+      const genreList = vodClass.split(/[,，/.。·\s]/g) ?? []
       if (genreList.length > 0) {
         for (const genre of genreList) {
           const trimGenre = genre.trim()

@@ -1,10 +1,10 @@
-import type { FindOptionsWhere } from 'typeorm'
-import { Like } from 'typeorm'
 import type { VideoEpisodeListQuery, VideoPageListQuery } from '@/api/types/video'
+import type { FindOptionsWhere } from 'typeorm'
 import { makeListResult, makeResult } from '@/api/utils'
 import { AppDataSource } from '@/repository/data-source'
 import { Episode } from '@/repository/entry/episode'
 import { Video } from '@/repository/entry/video'
+import { Like } from 'typeorm'
 
 // const log = debug('api:service:video')
 const videoRepository = AppDataSource.getRepository(Video)
