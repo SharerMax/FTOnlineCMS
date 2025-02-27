@@ -81,9 +81,6 @@ importers:
       '@types/node':
         specifier: ^22.13.5
         version: 22.13.5
-      tsup:
-        specifier: ^8.4.0
-        version: 8.4.0(@swc/core@1.11.1)(jiti@2.4.2)(postcss@8.5.3)(typescript@5.7.3)(yaml@2.7.0)
 
   apps/ft-admin:
     dependencies:
@@ -110,11 +107,7 @@ importers:
         specifier: ^2.2.4
         version: 2.2.4(typescript@5.7.3)
 
-  packages/api-model-type:
-    devDependencies:
-      tsup:
-        specifier: ^8.4.0
-        version: 8.4.0(@swc/core@1.11.1)(jiti@2.4.2)(postcss@8.5.3)(typescript@5.7.3)(yaml@2.7.0)
+  packages/api-model-type: {}
 
   packages/eslint-config:
     dependencies:

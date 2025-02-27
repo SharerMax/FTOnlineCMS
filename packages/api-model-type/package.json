@@ -9,8 +9,5 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --env.NODE_ENV development"
-  },
-  "devDependencies": {
-    "tsup": "^8.4.0"
   }
 }
