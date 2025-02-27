@@ -1,0 +1,16 @@
+{
+  "name": "api-model-type",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "exports": {
+    "types": "./typse"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --env.NODE_ENV development"
+  },
+  "devDependencies": {
+    "tsup": "^8.4.0"
+  }
+}

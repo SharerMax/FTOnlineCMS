@@ -1,0 +1,20 @@
+{
+  "extends": "@tsconfig/node22/tsconfig.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "baseUrl": "./",
+    "module": "ESNext",
+    // "allowImportingTsExtensions": true,
+    "moduleResolution": "Bundler",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "strictPropertyInitialization": false,
+    "outDir": "dist",
+    "sourceMap": true
+  },
+  "include": ["src/**/*", "./*"],
+  "exclude": ["node_modules", "dist"]
+}

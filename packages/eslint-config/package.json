@@ -1,0 +1,23 @@
+{
+  "name": "eslint-config",
+  "type": "module",
+  "version": "0.0.1",
+  "packageManager": "pnpm@10.5.2",
+  "description": "",
+  "author": "",
+  "license": "ISC",
+  "keywords": [],
+  "exports": {
+    "types": "./dist/main.d.ts",
+    "import": "./dist/main.js",
+    "default": "./dist/main.js"
+  },
+  "main": "./dist/main.js",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --env.NODE_ENV development"
+  },
+  "dependencies": {
+    "@antfu/eslint-config": "^4.3.0"
+  }
+}

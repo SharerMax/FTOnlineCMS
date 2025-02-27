@@ -145,3 +145,6 @@ dist
 
 #db file. auto create
 db
+
+# turboRepo
+.turbo
