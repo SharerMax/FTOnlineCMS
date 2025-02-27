@@ -23,7 +23,7 @@ export class Parser {
   normalizedLanguage(language: string) {
     if (!language)
       return ''
-    if (language === '国语' || language === '普通话' || language === '汉语' || language === '汉语普通话')
+    if (language.includes('国语') || language.includes('普通话') || language.includes('汉语'))
       return '国语'
     if (language === '其他' || language === '其它')
       return ''

@@ -1,11 +1,12 @@
 import type { VideoType } from '@/repository/types'
+import type { $Fetch } from 'ofetch'
 import type { EntityManager } from 'typeorm'
 import type { ApiResponse, ParsedVideo, ParsedVideoEposide, VideoDetail } from './types'
 import os from 'node:os'
 import process from 'node:process'
 import debug from 'debug'
 import { mergeWith } from 'lodash-es'
-import { type $Fetch, ofetch } from 'ofetch'
+import { ofetch } from 'ofetch'
 import pLimit from 'p-limit'
 import { AppDataSource } from '../repository/data-source'
 import { Episode } from '../repository/entry/episode'
@@ -26,6 +27,7 @@ export class Crawler {
   #pageNum = 1
   #maxHandleNum = os.cpus().length + 1
   #syncTask = pLimit(1)
+  #cachedGenres = new Map<string, Genre>()
   constructor(providerId: number, apiUrl: string) {
     this.apiUrl = apiUrl
     this.providerId = providerId
@@ -35,6 +37,8 @@ export class Crawler {
   }
 
   async run() {
+    const savedGenres = await AppDataSource.getRepository(Genre).find()
+    savedGenres.forEach(genre => this.#cachedGenres.set(genre.name, genre))
     // parallelLimit(this, this.#maxHandleNum)
     const tasks: Promise<any>[] = []
     for (let i = 0; i <= this.#maxHandleNum; i++) {
@@ -64,7 +68,6 @@ export class Crawler {
   //     },
   //   }
   // }
-
   async next(pageNum: number) {
     try {
       log('start fetch page(%d): %d', this.providerId, pageNum)
@@ -121,9 +124,11 @@ export class Crawler {
       if (!trimGenre)
         continue
       const genreRepository = entityManager.getRepository(Genre)
-      let savedGenre = await genreRepository.findOneBy({ name: trimGenre })
-      if (!savedGenre)
+      let savedGenre = this.#cachedGenres.get(trimGenre)
+      if (!savedGenre) {
         savedGenre = await genreRepository.save({ name: trimGenre })
+        this.#cachedGenres.set(trimGenre, savedGenre)
+      }
       const videoGenreRepository = entityManager.getRepository(VideoGenre)
       const savedVideoGenre = await videoGenreRepository.findOneBy({ video: { id: video.id }, genre: { id: savedGenre.id } })
       if (!savedVideoGenre) {
