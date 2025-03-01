@@ -21,12 +21,12 @@
   "devDependencies": {
     "@antfu/eslint-config": "^4.3.0",
     "@tsconfig/node22": "^22.0.0",
-    "@types/node": "^22.13.5",
+    "@types/node": "^22.13.8",
     "eslint": "^9.21.0",
     "eslint-config": "workspace:*",
     "tsup": "^8.4.0",
     "turbo": "^2.4.4",
-    "typescript": "^5.7.3"
+    "typescript": "^5.8.2"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
