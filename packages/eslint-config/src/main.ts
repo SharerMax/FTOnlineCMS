@@ -6,6 +6,10 @@ export const antfuConfigOption: Parameters<typeof antfu>[0] = {
       'vue/block-order': ['warn', {
         order: ['template', 'script', 'style'],
       }],
+      'vue/max-attributes-per-line': ['warn', {
+        singleline: 3,
+        multiline: 1,
+      }],
     },
   },
   rules: {
