@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 /// <reference types="unplugin-icons/types/vue" />
+/// <reference types="unplugin-vue-router/client" />
 
 interface ImportMetaEnv {
   readonly VITE_API_BASE_URL: string

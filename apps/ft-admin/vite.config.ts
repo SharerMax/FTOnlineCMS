@@ -2,12 +2,13 @@ import { fileURLToPath } from 'node:url'
 import vue from '@vitejs/plugin-vue'
 import Unocss from 'unocss/vite'
 import Icons from 'unplugin-icons/vite'
+import VueRouter from 'unplugin-vue-router/vite'
 
 import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), Unocss(), Icons()],
+  plugins: [VueRouter(), vue(), Unocss(), Icons()],
   resolve: {
     alias: {
       // '@': '/src',   will be work, but not confirm

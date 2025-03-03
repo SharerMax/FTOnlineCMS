@@ -3,7 +3,8 @@
   "files.readonlyInclude": {
     "**/node_modules/**": true,
     "**/dist/**": true,
-    "pnpm-lock.yaml": true
+    "**/pnpm-lock.yaml": true,
+    "**/typed-router.d.ts": true
   },
   "files.exclude": {
     "**/.git": true,
