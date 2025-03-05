@@ -8,7 +8,9 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [VueRouter(), vue(), Unocss(), Icons()],
+  plugins: [VueRouter({
+    exclude: ['src/pages/**/components/**'],
+  }), vue(), Unocss(), Icons()],
   resolve: {
     alias: {
       // '@': '/src',   will be work, but not confirm

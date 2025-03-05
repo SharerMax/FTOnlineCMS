@@ -8,3 +8,10 @@ export interface ProviderRes {
   createDateTime: string
   updateDateTime: string
 }
+export interface ProviderData {
+  name: string
+  apiUrl: string
+  apiKey?: string
+  priority: number
+  enable: boolean
+}
