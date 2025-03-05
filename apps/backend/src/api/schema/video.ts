@@ -1,5 +1,5 @@
 import z from 'zod'
-import { commomIntIdSchema } from '.'
+import { commonIntIdSchema } from './common'
 
 export const videoPageListSchema = z.object({
   page: z.number({ coerce: true }).int().positive(), // > 0
@@ -23,4 +23,4 @@ export const videoProviderByVideoSchema = z.object({
   videoId: z.number({ coerce: true }).int().positive(),
 })
 
-export const videoProviderDetailQuerySchema = commomIntIdSchema
+export const videoProviderDetailQuerySchema = commonIntIdSchema

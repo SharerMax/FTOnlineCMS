@@ -1,7 +1,8 @@
 import type { z } from 'zod'
-import type { providerBodySchema, providerIdSchema, videoProviderByVideoSchema, videoProviderDetailQuerySchema } from '../schema'
+import type { videoProviderByVideoSchema, videoProviderDetailQuerySchema } from '../schema'
+import type { providerBodySchema, providerIdSchema } from '../schema/provider'
 
-export type ProviderQuery = z.infer<typeof providerIdSchema>
+export type ProviderIdQuery = z.infer<typeof providerIdSchema>
 export type VideoProviderListQuery = z.infer<typeof videoProviderByVideoSchema>
 export type VideoProviderDetailQuery = z.infer<typeof videoProviderDetailQuerySchema>
 

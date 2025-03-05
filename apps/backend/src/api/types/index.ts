@@ -1,7 +1,7 @@
 import type { z } from 'zod'
-import type { commomIntIdSchema } from '../schema'
+import type { commonIntIdSchema } from '../schema/common'
 
 export * from './provider'
 export * from './video'
 
-export type CommonIntIdQuery = z.infer<typeof commomIntIdSchema>
+export type CommonIntIdQuery = z.infer<typeof commonIntIdSchema>
