@@ -19,9 +19,9 @@
     "build:package": "turbo run build:package"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^4.3.0",
+    "@antfu/eslint-config": "^4.5.1",
     "@tsconfig/node22": "^22.0.0",
-    "@types/node": "^22.13.8",
+    "@types/node": "^22.13.9",
     "eslint": "^9.21.0",
     "eslint-config": "workspace:*",
     "tsup": "^8.4.0",

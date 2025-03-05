@@ -18,6 +18,6 @@
     "dev": "tsup --env.NODE_ENV development"
   },
   "dependencies": {
-    "@antfu/eslint-config": "^4.3.0"
+    "@antfu/eslint-config": "^4.5.1"
   }
 }
