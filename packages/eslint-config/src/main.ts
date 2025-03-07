@@ -12,6 +12,11 @@ export const antfuConfigOption: Parameters<typeof antfu>[0] = {
       }],
     },
   },
+  typescript: {
+    overrides: {
+      'no-unused-vars': 'off',
+    },
+  },
   rules: {
     'no-unused-vars': 'warn',
     'unused-imports/no-unused-vars': 'warn',

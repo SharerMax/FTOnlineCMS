@@ -14,7 +14,7 @@ async function startCrawler() {
     for (const provider of providers) {
       const crawler = new Crawler(provider.id, provider.apiUrl)
       const startTime = new Date()
-      const crawlerTask = await crawlerTaskRepository.save({ providerId: provider.id, status: 1, startTime, endTime: startTime })
+      const crawlerTask = await crawlerTaskRepository.save({ provider, startTime, endTime: new Date(), status: 1 })
       try {
         await crawler.run()
         await crawlerTaskRepository.update({ id: crawlerTask.id }, { endTime: new Date(), status: 2 })

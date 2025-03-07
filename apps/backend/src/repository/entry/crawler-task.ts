@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { Provider } from './provider'
 
 @Entity()
 export class CrawlerTask {
@@ -10,8 +11,9 @@ export class CrawlerTask {
   })
   status: number
 
-  @Column()
-  providerId: number
+  @ManyToOne(() => Provider, provider => provider.id)
+  @JoinColumn({ name: 'providerId' })
+  provider: Provider
 
   @Column()
   startTime: Date

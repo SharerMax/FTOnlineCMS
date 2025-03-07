@@ -2,6 +2,7 @@ import { createServer } from 'node:http'
 import process from 'node:process'
 import debug from 'debug'
 import { createApp, createError, createRouter, defaultContentType, defineEventHandler, getResponseStatus, handleCors, sendError, toNodeListener, useBase } from 'h3'
+import { crawlerRouter } from './controller/crawler-task'
 import { genreRouter } from './controller/genre'
 import { providerRouter } from './controller/provider'
 import { videoRouter } from './controller/video'
@@ -33,6 +34,7 @@ const apiRouter = createRouter()
 apiRouter.use('/video/**', useBase('/video', videoRouter.handler))
 apiRouter.use('/provider/**', useBase('/provider', providerRouter.handler))
 apiRouter.use('/genre/**', useBase('/genre', genreRouter.handler))
+apiRouter.use('/crawlerTask/**', useBase('/crawlerTask', crawlerRouter.handler))
 router.use('/api/**', useBase('/api', apiRouter.handler))
 
 // CORS middleware
