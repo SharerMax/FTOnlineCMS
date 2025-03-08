@@ -30,9 +30,9 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@swc/core": "^1.11.7",
+    "@swc/core": "^1.11.8",
     "@types/debug": "^4.1.12",
     "@types/lodash-es": "^4.17.12",
-    "@types/node": "^22.13.9"
+    "@types/node": "^22.13.10"
   }
 }
