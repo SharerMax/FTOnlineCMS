@@ -34,5 +34,6 @@ export default defineConfig({
         assetFileNames: 'assets/[ext]/[name]-[hash][extname]',
       },
     },
+    sourcemap: true,
   },
 })

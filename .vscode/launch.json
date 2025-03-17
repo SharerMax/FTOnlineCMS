@@ -1,6 +1,13 @@
 {
   "configurations": [
     {
+      "name": "ft-admin",
+      "request": "launch",
+      "type": "chrome",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}/apps/ft-admin/dist"
+    },
+    {
       "name": "backend",
       "request": "launch",
       "program": "${workspaceFolder}/apps/backend/dist/app.js",
