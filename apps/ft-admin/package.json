@@ -10,13 +10,13 @@
   },
   "dependencies": {
     "ant-design-vue": "^4.2.6",
-    "axios": "^1.8.3",
+    "axios": "^1.8.4",
     "dayjs": "^1.11.13",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
-    "@iconify/json": "^2.2.317",
+    "@iconify/json": "^2.2.330",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vue/tsconfig": "^0.7.0",
     "browserslist": "^4.24.4",
@@ -24,7 +24,7 @@
     "unocss": "66.1.0-beta.3",
     "unplugin-icons": "^22.1.0",
     "unplugin-vue-router": "^0.11.2",
-    "vite": "^6.2.2",
+    "vite": "^6.3.2",
     "vue-tsc": "^2.2.8"
   }
 }
